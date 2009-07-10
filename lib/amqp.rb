@@ -37,6 +37,9 @@ module AMQP
       # connection timeout
       :timeout => nil,
 
+      # reconnection delay when unexpectedly disconnected
+      :retry => true,
+
       # logging
       :logging => false,
 
@@ -60,6 +63,10 @@ module AMQP
   # The virtual host as defined by the AMQP server.
   # * :timeout => Numeric (default nil)
   # Measured in seconds.
+  # * :retry => true | false | Numeric | Proc (which returns any of the previous)
+  # How/whether to reconnect when unexpectedly disconnected: immediately, not at all, or after a delay.
+  # If a Proc is passed it will be evaluated upon every reconnect attempt, which allows for exponential backoff,
+  # limited reconnect attempts, and other complex behavior.
   # * :logging => true | false (default false)
   # Toggle the extremely verbose logging of all protocol communications
   # between the client and the server. Extremely useful for debugging.

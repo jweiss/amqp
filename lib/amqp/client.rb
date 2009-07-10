@@ -170,14 +170,30 @@ module AMQP
       end
 
       unless @reconnecting
-        @reconnecting = true
-
         @deferred_status = nil
         initialize(@settings)
 
         mqs = @channels
         @channels = {}
         mqs.each{ |_,mq| mq.reset } if mqs
+
+        @reconnecting = true
+
+        again = @settings[:retry]
+        again = again.call if again.is_a?(Proc)
+
+        if again == false
+          #do not retry connection
+          raise Error, "Could not reconnect to server #{@settings[:host]}:#{@settings[:port]}"
+        elsif again.is_a?(Numeric)
+          #retry connection after N seconds
+          EM.add_timer(again){ reconnect(true) }
+          return
+        elsif (again == true || again == nil)
+          #do nothing; immediately retry with no delay
+        else
+          raise Error, "Could not interpret reconnection retry action #{again}"
+        end
       end
 
       log 'reconnecting'
