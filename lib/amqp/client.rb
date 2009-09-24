@@ -68,6 +68,8 @@ module AMQP
       errback{ @on_disconnect.call } unless @reconnecting
 
       @connected = false
+
+      @connection_status = @settings[:connection_status]
     end
 
     def connection_completed
@@ -205,7 +207,16 @@ module AMQP
       EM.connect opts[:host], opts[:port], self, opts
     end
 
-    def connection_status &blk
+    # set a callback that will get called on connected/disconneced
+    # distinguish the event with the given event name
+    # e.g. connection_status = proc {|event|
+    #   if event == :connected
+    #     # connected
+    #   else
+    #     # disconneced
+    #   end
+    # }
+    def connection_status=(&blk)
       @connection_status = blk
     end
 
