@@ -44,7 +44,19 @@ module AMQP
       :logging => false,
 
       # ssl
-      :ssl => false
+      :ssl => false,
+      
+      # callback that will get called on connected/disconnected events
+      # watch out - the disconnected callback will fire on every disconnect
+      # e.g. connection_status = proc {|event|
+      #   if event == :connected
+      #     # connected
+      #   else
+      #     # disconneced
+      #   end
+      # }
+      :connection_status => nil
+      
     }
   end
 
